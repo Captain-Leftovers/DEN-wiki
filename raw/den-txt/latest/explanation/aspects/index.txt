@@ -1,0 +1,211 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * The __functor Pattern
+     * Aspects as Functors
+     * Aspect Structure
+          + Owned Configurations
+          + Includes
+          + Provides
+     * Resolution
+
+On this page
+
+     * Overview
+     * The __functor Pattern
+     * Aspects as Functors
+     * Aspect Structure
+          + Owned Configurations
+          + Includes
+          + Provides
+     * Resolution
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Aspects & Functors
+
+   Source
+
+   nix/lib/aspects — nix/lib.nix —
+
+The __functor Pattern
+
+   Section titled “The __functor Pattern”
+
+   Any Nix attrset with __functor can be called as a function:
+
+   let
+
+   counter = {
+   value = 42;
+   __functor = self: n: self.value + n;
+   };
+   in counter 8 # => 50
+   (BUTTON)
+
+   The __functor receives self (the attrset itself) and returns a
+   function.
+
+Aspects as Functors
+
+   Section titled “Aspects as Functors”
+
+   Every aspect in Den has a default __functor that inspects context
+   parameters to decide what to produce:
+
+   # Default: parametric. inspects context shape
+
+   den.lib.parametric {
+   nixos.foo = 1;
+   includes = [
+   ({ host }: { nixos.networking.hostName = host.hostName; })
+   ({ user }: { homeManager.home.username = user.userName; })
+   ];
+   }
+   (BUTTON)
+
+Aspect Structure
+
+   Section titled “Aspect Structure”
+
+   Aspects have three kinds of attributes:
+
+Owned Configurations
+
+   Section titled “Owned Configurations”
+
+   Direct settings per Nix class:
+
+   den.aspects.igloo = {
+
+   nixos.networking.hostName = "igloo";
+   darwin.nix-homebrew.enable = true;
+   homeManager.programs.vim.enable = true;
+   };
+   (BUTTON)
+
+Includes
+
+   Section titled “Includes”
+
+   A list forming a dependency graph:
+
+   den.aspects.igloo.includes = [
+
+   # Static: applied unconditionally
+   { nixos.programs.vim.enable = true; }
+   # Parametric: applied when context matches argument shape
+   ({ host, ... }: { nixos.time.timeZone = "UTC"; })
+   # Reference to another aspect
+   den.aspects.tools
+   ];
+   (BUTTON)
+
+Provides
+
+   Section titled “Provides”
+
+   Named sub-aspects scoped to this aspect, accessible via
+   den.aspects.igloo._.name or den.aspects.igloo.provides.name:
+
+   den.aspects.igloo.provides.gpu = { host, ... }:
+
+   lib.optionalAttrs (host ? gpu) {
+   nixos.hardware.nvidia.enable = true;
+   };
+   (BUTTON)
+
+Resolution
+
+   Section titled “Resolution”
+
+   Aspects are resolved for a specific class using the
+   den.lib.aspects.resolve API.
+
+   module = den.lib.aspects.resolve "nixos" den.aspects.igloo;
+
+   (BUTTON)
+
+   Resolution collects all nixos attrs from owned configs, walks includes
+   recursively, applies parametric dispatch, deduplicates, and produces a
+   single deferredModule containing all NixOS configuration.
+
+   Edit page
+
+   Previous
+   Context System Next
+   Parametric Aspects
+
+   Contribute Community Sponsor

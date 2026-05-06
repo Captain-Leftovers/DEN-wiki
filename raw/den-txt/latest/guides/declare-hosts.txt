@@ -1,0 +1,255 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Host Declaration
+     * Host Schema
+     * User Declaration
+     * Standalone Homes
+     * Base Modules
+     * Freeform Schema
+
+On this page
+
+     * Overview
+     * Host Declaration
+     * Host Schema
+     * User Declaration
+     * Standalone Homes
+     * Base Modules
+     * Freeform Schema
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Declare Hosts & Users
+
+   Source
+
+   types - schema - examples/microvm
+
+Host Declaration
+
+   Section titled “Host Declaration”
+
+   den.hosts is keyed by <system>.<name>:
+
+   {
+
+   den.hosts.x86_64-linux.laptop.users.alice = { };
+   den.hosts.aarch64-darwin.mac = {
+   users.alice = { };
+   brew.apps = [ "iterm2" ];
+   };
+   }
+   (BUTTON)
+
+   Each host entry produces a configuration in flake.nixosConfigurations
+   or flake.darwinConfigurations depending on its class (auto-detected
+   from the host platform).
+
+Host Schema
+
+   Section titled “Host Schema”
+
+   Important
+
+   Be sure to read about the entity Schemas, each of host/user/home has a
+   corresponding den.schema.* module for meta-configuration of entity
+   features. Which can later be used in aspects that read from host. These
+   schemas are the meta-data equivalent of what Dendritic flake-parts
+   users do with flake-level options.
+
+   Hosts have these options (all with sensible defaults):
+     Option          Default                    Description
+   name        attrset key          Configuration name
+   hostName    name                 Network hostname
+   system      parent key           x86_64-linux, aarch64-darwin, etc.
+   class       "nixos" or "darwin"  OS class, auto-detected from system
+   aspect      name                 Primary aspect name
+   instantiate class-dependent      lib.nixosSystem, darwinSystem, etc.
+   intoAttr    class-dependent      Flake output path
+   users       {}                   User account definitions
+   *           from den.schema.host Any option defined by base module
+   *                                Any other free-form attribute
+
+User Declaration
+
+   Section titled “User Declaration”
+
+   Users are declared as part of a host:
+
+   den.hosts.x86_64-linux.laptop = {
+
+   users.alice = { };
+   users.bob.classes = [ "homeManager" "hjem" ];
+   };
+   (BUTTON)
+
+   Each user has:
+    Option        Default                     Description
+   name     attrset key          User configuration name
+   userName name                 System account name
+   aspect   name                 Primary aspect name
+   classes  [ "homeManager" ]    Nix classes this user participates in
+   *        from den.schema.user Any option defined by base module
+   *                             Any other free-form attribute
+
+Standalone Homes
+
+   Section titled “Standalone Homes”
+
+   For systems without root access or for home-manager-only setups:
+
+   {
+
+   den.homes.x86_64-linux.alice = { };
+   den.homes.aarch64-darwin.alice = { };
+   }
+   (BUTTON)
+
+   Standalone homes produce flake.homeConfigurations.<name>.
+
+   Home schema:
+   Option Default Description
+   name attrset key Home configuration name
+   userName name User account name
+   system parent key Platform system
+   class "homeManager" Home class
+   aspect name Primary aspect name
+   pkgs inputs.nixpkgs.legacyPackages.${system} nixpkgs instance
+   instantiate inputs.home-manager.lib.homeManagerConfiguration Builder
+   function
+   * from den.schema.host Any option defined by base module
+   * Any other free-form attribute
+
+Base Modules
+
+   Section titled “Base Modules”
+
+   den.schema.{host,user,home} provides shared configuration applied to
+   all entities of each kind.
+
+   Some batteries also extend base modules see home-env.nix that is used
+   by home-manager/hjem/maid to extend the Host schema with options like
+   hjem.module/home-manager.module.
+
+   Another more advanced examples is our templates/microvm that adds
+   options related to running virtualized OS.
+
+   {
+
+   # Can be used to specify features of all host
+   den.schema.host.home-manager.enable = true;
+   # Can be used to add schema options with defaults
+   den.schema.user = { user, lib, ... }: {
+   options.groupName = lib.mkOption { default = user.userName; };
+   };
+   # Applied to every host and user and home.
+   den.schema.conf = {
+   options.copyright = lib.mkOption { default = "Copy-Left"; };
+   };
+   }
+   (BUTTON)
+
+Freeform Schema
+
+   Section titled “Freeform Schema”
+
+   Host and user types use freeformType, so you can add arbitrary
+   attributes:
+
+   den.hosts.x86_64-linux.laptop = {
+
+   users.alice = { };
+   gpu = "nvidia"; # custom attribute, accessible in aspects via host.gpu
+   };
+   (BUTTON)
+
+   Access custom attributes in aspects:
+
+   den.aspects.laptop.includes = [
+
+   ({ host, ... }: lib.optionalAttrs (host ? gpu) {
+   nixos.hardware.nvidia.enable = true;
+   })
+   ];
+   (BUTTON)
+
+   Edit page
+
+   Previous
+   From Flake to Den Next
+   Configure Aspects
+
+   Contribute Community Sponsor

@@ -1,0 +1,243 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Initialize
+     * Project Structure
+     * flake.nix
+     * modules/den.nix
+          + What This Declares
+          + How It Works
+     * Build It
+     * Customize
+     * What It Provides
+     * Next Steps
+
+On this page
+
+     * Overview
+     * Initialize
+     * Project Structure
+     * flake.nix
+     * modules/den.nix
+          + What This Declares
+          + How It Works
+     * Build It
+     * Customize
+     * What It Provides
+     * Next Steps
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Template: Minimal
+
+   Source
+
+   templates/minimal
+
+   The minimal template demonstrates Den’s core with zero extra
+   dependencies beyond nixpkgs.
+
+Initialize
+
+   Section titled “Initialize”
+   Terminal window
+
+   mkdir my-nix && cd my-nix
+
+   nix flake init -t github:vic/den#minimal
+   nix flake update den
+   (BUTTON)
+
+Project Structure
+
+   Section titled “Project Structure”
+
+   flake.nix
+
+   modules/
+   den.nix
+   (BUTTON)
+
+flake.nix
+
+   Section titled “flake.nix”
+
+   {
+
+   outputs = inputs:
+   (inputs.nixpkgs.lib.evalModules {
+   modules = [ (inputs.import-tree ./modules) ];
+   specialArgs = { inherit inputs; };
+   }).config.flake;
+   inputs = {
+   nixpkgs.url =
+   "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
+   import-tree.url = "github:vic/import-tree";
+   den.url = "github:vic/den";
+   };
+   }
+   (BUTTON)
+
+   Key points:
+     * No flake-parts — uses lib.evalModules directly
+     * import-tree — recursively loads all .nix files under modules/
+     * Results land in .config.flake (nixosConfigurations, etc.)
+
+modules/den.nix
+
+   Section titled “modules/den.nix”
+
+   { inputs, den, ... }:
+
+   {
+   imports = [ inputs.den.flakeModule ];
+   den.hosts.x86_64-linux.igloo.users.tux = { };
+   den.aspects.igloo = {
+   nixos = { pkgs, ... }: {
+   environment.systemPackages = [ pkgs.hello ];
+   boot.loader.grub.enable = false; # TODO: remove for real hardware
+   fileSystems."/".device = "/dev/null";
+   };
+   };
+   den.aspects.tux = {
+   includes = [ den.provides.primary-user ];
+   };
+   }
+   (BUTTON)
+
+What This Declares
+
+   Section titled “What This Declares”
+    1. One host named igloo on x86_64-linux with one user named tux
+    2. Host aspect den.aspects.igloo — provides NixOS config (a package +
+       boot/fs stubs)
+    3. User aspect den.aspects.tux — includes the primary-user battery
+
+How It Works
+
+   Section titled “How It Works”
+graph TD
+  H["den.hosts.x86_64-linux.igloo"] -->|"ctx.host"| A["den.aspects.igloo"]
+  H -->|"ctx.user"| U["den.aspects.tux"]
+  U -->|"includes"| PU["den.provides.primary-user"]
+  A -->|"resolve nixos"| NixOS["nixosConfigurations.igloo"]
+    1. Den reads den.hosts and creates a ctx.host { host = igloo } context
+    2. The host aspect igloo is activated with its NixOS config
+    3. For each user, a ctx.user { host, user } context is created
+    4. The user aspect tux includes primary-user (adds
+       wheel/networkmanager groups)
+    5. Everything resolves into nixosConfigurations.igloo
+
+Build It
+
+   Section titled “Build It”
+   Terminal window
+
+   nix build .#nixosConfigurations.igloo.config.system.build.toplevel
+
+   (BUTTON)
+
+Customize
+
+   Section titled “Customize”
+
+   To add your own host configuration, edit den.aspects.igloo.nixos. To
+   add user packages, add a homeManager key to den.aspects.tux (requires
+   adding home-manager input). Or keep it simple — the minimal template
+   works without Home-Manager.
+
+What It Provides
+
+   Section titled “What It Provides”
+              Feature             Provided
+   NixOS host configuration          ✓
+   User with wheel/networkmanager    ✓
+   Home-Manager                      ✗
+   Darwin support                    ✗
+   Namespaces                        ✗
+   VM testing                        ✗
+
+Next Steps
+
+   Section titled “Next Steps”
+     * Add more aspects in separate files under modules/
+     * Graduate to the Default template for Home-Manager support
+     * Read Core Principles to understand the context pipeline
+
+   Edit page
+   Previous
+   Overview Next
+   Default
+   Contribute Community Sponsor

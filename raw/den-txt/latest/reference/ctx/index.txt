@@ -1,0 +1,305 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * den.ctx
+     * Context Type Options
+          + description
+          + _ (alias: provides)
+          + into
+          + meta.adapter
+          + includes
+          + modules
+     * Built-in Context Types
+          + den.ctx.host
+          + den.ctx.user
+          + den.ctx.home
+          + den.ctx.hm-host
+          + den.ctx.hm-user
+          + den.ctx.wsl-host
+     * Custom Context Types
+
+On this page
+
+     * Overview
+     * den.ctx
+     * Context Type Options
+          + description
+          + _ (alias: provides)
+          + into
+          + meta.adapter
+          + includes
+          + modules
+     * Built-in Context Types
+          + den.ctx.host
+          + den.ctx.user
+          + den.ctx.home
+          + den.ctx.hm-host
+          + den.ctx.hm-user
+          + den.ctx.wsl-host
+     * Custom Context Types
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+den.ctx
+
+   Source
+
+   modules/context/types.nix — modules/context/os.nix
+
+den.ctx
+
+   Section titled “den.ctx”
+
+   Type: lazyAttrsOf ctxType
+
+   A map of context type names to context type definitions. Each context
+   type defines how data flows through the evaluation pipeline.
+
+Context Type Options
+
+   Section titled “Context Type Options”
+
+   Each den.ctx.<name> has:
+
+description
+
+   Section titled “description”
+
+   Type: str
+
+   Human-readable description of this context type.
+
+_ (alias: provides)
+
+   Section titled “_ (alias: provides)”
+
+   Type: attrsOf providerType
+
+   Maps context names to provider functions. When this context is
+   processed, each provider is called with the current context data and
+   returns aspect fragments.
+
+   den.ctx.host._.host = { host }:
+
+   parametric.fixedTo { inherit host; } den.aspects.${host.aspect};
+   (BUTTON)
+
+into
+
+   Section titled “into”
+
+   Type: lazyAttrsOf (functionTo (listOf raw))
+
+   Maps other context type names to transformation functions. Each
+   function takes the current context data and returns a list of new
+   context values.
+
+   den.ctx.host.into.user = { host }:
+
+   map (user: { inherit host user; }) (lib.attrValues host.users);
+   (BUTTON)
+
+meta.adapter
+
+   Section titled “meta.adapter”
+
+   Type: nullOr (functionTo raw)
+
+   An adapter that controls how aspects are resolved within this context.
+   Set on a context node to filter or transform aspects transitively
+   during resolution.
+
+   den.ctx.host.meta.adapter = inherited:
+
+   den.lib.aspects.adapters.filter (a: a.name != "unwanted") inherited;
+   (BUTTON)
+
+   The adapter composes with aspect-level meta.adapter values — context
+   adapters are outermost, aspect adapters are innermost.
+
+includes
+
+   Section titled “includes”
+
+   Aspect includes attached to this context type. Used by batteries to
+   inject behavior at specific pipeline stages.
+
+modules
+
+   Section titled “modules”
+
+   Additional modules merged into the resolved output.
+
+Built-in Context Types
+
+   Section titled “Built-in Context Types”
+
+den.ctx.host
+
+   Section titled “den.ctx.host”
+
+   Context data: { host }
+
+   Produced for each den.hosts.<system>.<name> entry.
+
+   Providers:
+     * _.host — fixedTo { host } on the host’s aspect.
+     * _.user — atLeast on the host’s aspect with { host, user }.
+
+   Transitions:
+     * into.default — identity (for default aspect).
+     * into.user — one { host, user } per host.users entry.
+     * into.hm-host — (from hm-os.nix) if HM enabled and has HM users.
+     * into.wsl-host — (from wsl.nix) if WSL enabled on NixOS host.
+     * into.hjem-host — (from hjem-os.nix) if hjem enabled.
+     * into.maid-host — (from maid-os.nix) if nix-maid enabled.
+
+den.ctx.user
+
+   Section titled “den.ctx.user”
+
+   Context data: { host, user }
+
+   Providers:
+     * _.user — fixedTo { host, user } on the user’s aspect.
+
+   Transitions:
+     * into.default — identity.
+
+den.ctx.home
+
+   Section titled “den.ctx.home”
+
+   Context data: { home }
+
+   Produced for each den.homes.<system>.<name> entry.
+
+   Providers:
+     * _.home — fixedTo { home } on the home’s aspect.
+
+den.ctx.hm-host
+
+   Section titled “den.ctx.hm-host”
+
+   Context data: { host }
+
+   Providers:
+     * provides.hm-host — imports HM OS module.
+
+   Transitions:
+     * into.hm-user — per HM-class user.
+
+den.ctx.hm-user
+
+   Section titled “den.ctx.hm-user”
+
+   Context data: { host, user }
+
+   Providers:
+     * _.hm-user — forwards homeManager class to
+       home-manager.users.<userName>.
+
+den.ctx.wsl-host
+
+   Section titled “den.ctx.wsl-host”
+
+   Context data: { host }
+
+   Providers:
+     * provides.wsl-host — imports WSL module, creates wsl class forward.
+
+Custom Context Types
+
+   Section titled “Custom Context Types”
+
+   Define new contexts to extend the pipeline:
+
+   {
+
+   den.ctx.gpu = {
+   description = "GPU-enabled host";
+   _.gpu = { host }: {
+   nixos.hardware.nvidia.enable = true;
+   };
+   };
+   den.ctx.host.into.gpu = { host }:
+   lib.optional (host ? gpu) { inherit host; };
+   }
+   (BUTTON)
+   Edit page
+   Previous
+   den.provides Next
+   den.lib
+   Contribute Community Sponsor

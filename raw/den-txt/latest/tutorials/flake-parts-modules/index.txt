@@ -1,0 +1,143 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Initialize
+     * Project Structure
+     * Next Steps
+
+On this page
+
+     * Overview
+     * Initialize
+     * Project Structure
+     * Next Steps
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Template: Flake Parts Modules
+
+   Source
+
+   templates/flake-parts-modules
+
+   The flake-parts-modules template demonstrates how to use Den aspects
+   that propagate custom classes into third-party flake-parts perSystem
+   modules.
+
+   For demo purposes, the example showcases:
+     * perSystem.packages: How to expose flake-parts packages.
+     * numtide/devshell: A default devshell extensible by any aspect.
+     * mightyiam/files: Generates README from nix code.
+     * nix-community/nix-unit: Write tests directly on aspects.
+
+Initialize
+
+   Section titled “Initialize”
+   Terminal window
+
+   mkdir example && cd example
+
+   nix flake init -t github:vic/den#flake-parts-modules
+   nix flake update den
+   nix flake show
+   nix flake check -L
+   (BUTTON)
+
+Project Structure
+
+   Section titled “Project Structure”
+
+   flake.nix
+
+   modules/
+   perSystem-forward.nix # Custom den.ctx and perSystem forwarding class.
+   custom-classes.nix # Registers several classes for each third-party
+   den.nix # Example of aspects using those classes
+   (BUTTON)
+
+   Key points:
+     * New perSystem classes are registered via a context transition, from
+       any module.
+
+Next Steps
+
+   Section titled “Next Steps”
+     * Read flake.parts Documentation for more perSystem modules.
+
+   Edit page
+   Previous
+   CI Tests Next
+   From Zero to Den
+   Contribute Community Sponsor

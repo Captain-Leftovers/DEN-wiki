@@ -1,0 +1,262 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Initialize
+     * Project Structure
+     * File by File
+          + default.nix — Entry Point
+          + with-inputs.nix — Input Resolution
+          + modules/den.nix — Configuration
+     * Build
+     * What It Provides
+     * Next Steps
+
+On this page
+
+     * Overview
+     * Initialize
+     * Project Structure
+     * File by File
+          + default.nix — Entry Point
+          + with-inputs.nix — Input Resolution
+          + modules/den.nix — Configuration
+     * Build
+     * What It Provides
+     * Next Steps
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Template: No-Flake
+
+   Source
+
+   templates/noflake
+
+   The noflake template shows that Den works perfectly without Nix flakes.
+   It uses npins for dependency management and works with stable Nix.
+
+Initialize
+
+   Section titled “Initialize”
+
+   Since this template doesn’t use flakes, clone it manually:
+   Terminal window
+
+   mkdir my-nix && cd my-nix
+
+   cp -r $(nix eval --raw 'github:vic/den#templates.noflake.path')/* .
+   npins update den
+   (BUTTON)
+
+   Or use nix flake init if you have flakes enabled:
+   Terminal window
+
+   nix flake init -t github:vic/den#noflake
+
+   (BUTTON)
+
+Project Structure
+
+   Section titled “Project Structure”
+
+   default.nix # entry point (replaces flake.nix)
+
+   with-inputs.nix # input resolver (replaces flake.lock)
+   npins/
+   default.nix # npins fetcher
+   sources.json # pinned dependencies
+   modules/
+   den.nix # host/user declarations + aspects
+   (BUTTON)
+
+File by File
+
+   Section titled “File by File”
+
+default.nix — Entry Point
+
+   Section titled “default.nix — Entry Point”
+
+   let
+
+   outputs = inputs:
+   (inputs.nixpkgs.lib.evalModules {
+   modules = [ (inputs.import-tree ./modules) ];
+   specialArgs = {
+   inherit inputs;
+   inherit (inputs) self;
+   };
+   }).config;
+   in
+   import ./with-inputs.nix outputs
+   (BUTTON)
+
+   This is the noflake equivalent of flake.nix. It uses lib.evalModules
+   directly — the same mechanism Den uses internally.
+
+with-inputs.nix — Input Resolution
+
+   Section titled “with-inputs.nix — Input Resolution”
+
+   This file resolves npins sources into a flake-compatible inputs
+   attrset. It reads flake.nix from each dependency to discover transitive
+   inputs and wires them together.
+
+modules/den.nix — Configuration
+
+   Section titled “modules/den.nix — Configuration”
+
+   { inputs, ... }:
+
+   {
+   imports = [ inputs.den.flakeModule ];
+   den.default.nixos = {
+   fileSystems."/".device = "/dev/fake";
+   boot.loader.grub.enable = false;
+   };
+   den.hosts.x86_64-linux.igloo.users.tux = { };
+   den.aspects.igloo = {
+   nixos = { pkgs, ... }: {
+   environment.systemPackages = [ pkgs.vim ];
+   };
+   };
+   den.aspects.tux = {
+   nixos = {
+   imports = [ inputs.nix-maid.nixosModules.default ];
+   users.users.tux = {
+   isNormalUser = true;
+   maid.file.home.".gitconfig".text = ''
+   [user]
+   name=Tux
+   '';
+   };
+   };
+   };
+   }
+   (BUTTON)
+
+   Notable differences from the flake templates:
+     * Uses nix-maid instead of Home-Manager (lighter alternative)
+     * User config is done directly in nixos class (no HM class needed)
+
+Build
+
+   Section titled “Build”
+   Terminal window
+
+   npins update den
+
+   nixos-rebuild build --file . -A flake.nixosConfigurations.igloo
+   (BUTTON)
+
+   Or with nix-build:
+   Terminal window
+
+   nix-build -A
+   flake.nixosConfigurations.igloo.config.system.build.toplevel
+
+   (BUTTON)
+
+   Note
+
+   Den places configurations under the flake attribute following the flake
+   outputs schema, even without flakes. This is the default top-level
+   attribute for Den output.
+
+What It Provides
+
+   Section titled “What It Provides”
+            Feature              Provided
+   NixOS host configuration         ✓
+   No flakes required               ✓
+   npins dependency pinning         ✓
+   nix-maid (HM alternative)        ✓
+   Home-Manager              ✗ (use nix-maid)
+   flake-parts                      ✗
+
+Next Steps
+
+   Section titled “Next Steps”
+     * Read Core Principles to understand how Den works without flakes
+     * Consider the Minimal template if you want flakes but not
+       flake-parts
+
+   Edit page
+
+   Previous
+   Default Next
+   NVF Standalone
+
+   Contribute Community Sponsor

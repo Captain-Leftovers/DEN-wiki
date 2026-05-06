@@ -1,0 +1,312 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Initialize
+     * Project Structure
+     * Key Features Demonstrated
+          + Cross-Platform Hosts
+          + Namespaces
+          + Namespace Aspects
+          + Angle Brackets
+          + Mutual Providers
+          + Tests
+     * Data Flow
+     * What It Provides
+     * Next Steps
+
+On this page
+
+     * Overview
+     * Initialize
+     * Project Structure
+     * Key Features Demonstrated
+          + Cross-Platform Hosts
+          + Namespaces
+          + Namespace Aspects
+          + Angle Brackets
+          + Mutual Providers
+          + Tests
+     * Data Flow
+     * What It Provides
+     * Next Steps
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Template: Example
+
+   Source
+
+   templates/example
+
+   The example template demonstrates Den’s advanced features: namespaces,
+   angle brackets, cross-platform hosts, mutual providers, and custom
+   aspect libraries.
+
+Initialize
+
+   Section titled “Initialize”
+   Terminal window
+
+   mkdir my-nix && cd my-nix
+
+   nix flake init -t github:vic/den#example
+   nix flake update den
+   (BUTTON)
+
+Project Structure
+
+   Section titled “Project Structure”
+
+   flake.nix
+
+   modules/
+   den.nix # host/home declarations
+   dendritic.nix # flake-file + den wiring
+   inputs.nix # flake inputs
+   namespace.nix # creates the "eg" namespace
+   tests.nix # CI checks
+   vm.nix # VM runner
+   aspects/
+   defaults.nix # global config + angle brackets demo
+   alice.nix # user aspect
+   igloo.nix # host aspect
+   eg/ # namespace aspects
+   autologin.nix
+   ci-no-boot.nix
+   routes.nix
+   vm.nix
+   vm-bootable.nix
+   xfce-desktop.nix
+   (BUTTON)
+
+Key Features Demonstrated
+
+   Section titled “Key Features Demonstrated”
+
+Cross-Platform Hosts
+
+   Section titled “Cross-Platform Hosts”
+   modules/den.nix
+
+   {
+
+   den.hosts.x86_64-linux.igloo.users.alice = { };
+   den.hosts.aarch64-darwin.apple.users.alice = { };
+   den.homes.x86_64-linux.alice = { };
+   }
+   (BUTTON)
+
+   One user (alice) across a NixOS host, a Darwin host, and a standalone
+   Home-Manager config. The same aspects produce appropriate configs for
+   each platform.
+
+Namespaces
+
+   Section titled “Namespaces”
+   modules/namespace.nix
+
+   { inputs, den, ... }:
+
+   {
+   imports = [ (inputs.den.namespace "eg" true) ];
+   _module.args.__findFile = den.lib.__findFile;
+   }
+   (BUTTON)
+
+   Creates a local namespace eg accessible as a module argument. The true
+   flag exposes it as a flake output (flake.denful.eg). Angle brackets are
+   enabled via __findFile.
+
+Namespace Aspects
+
+   Section titled “Namespace Aspects”
+
+   The eg/ directory defines reusable aspects under the eg namespace:
+   modules/aspects/eg/vm.nix
+
+   { eg, ... }:
+
+   {
+   eg.vm.provides = {
+   gui.includes = [ eg.vm eg.vm-bootable._.gui eg.xfce-desktop ];
+   tui.includes = [ eg.vm eg.vm-bootable._.tui ];
+   };
+   }
+   (BUTTON)
+
+   Aspects can have nested provides — eg.vm._.gui and eg.vm._.tui are
+   sub-aspects accessed via the _. provider syntax.
+
+Angle Brackets
+
+   Section titled “Angle Brackets”
+   modules/aspects/defaults.nix
+
+   { den, __findFile ? __findFile, ... }:
+
+   {
+   den.default.includes = [
+   <eg/routes> # resolves to eg.routes
+   <den/define-user> # resolves to den.provides.define-user
+   ];
+   }
+   (BUTTON)
+
+   The <name> syntax is shorthand for aspect lookup. <den/define-user>
+   resolves to den.provides.define-user. See Angle Brackets.
+
+Mutual Providers
+
+   Section titled “Mutual Providers”
+
+   # modules/aspects/alice.nix — user provides config TO the host
+
+   den.aspects.alice = {
+   provides.igloo = { host, ... }: {
+   nixos.programs.nh.enable = host.name == "igloo";
+   };
+   };
+   # modules/aspects/igloo.nix — host provides config TO the user
+   den.aspects.igloo = {
+   provides.alice = { user, ... }: {
+   homeManager.programs.helix.enable = user.name == "alice";
+   };
+   };
+   (BUTTON)
+
+   Hosts and users can contribute configuration to each other through
+   provides. Alice enables nh on igloo, and igloo enables helix for alice.
+   These are cross-providers activated during context transformation.
+
+Tests
+
+   Section titled “Tests”
+
+   # modules/tests.nix — verifies the template works
+
+   {
+   checks."alice enabled igloo nh" = checkCond "..."
+   igloo.programs.nh.enable;
+   checks."igloo enabled alice helix" = checkCond "..."
+   alice-at-igloo.programs.helix.enable;
+   }
+   (BUTTON)
+
+Data Flow
+
+   Section titled “Data Flow”
+
+graph TD
+  D["den.nix: igloo/apple + alice"] --> CH["ctx.host"]
+  CH --> AI["aspects.igloo<br/>nixos + provides.alice"]
+  CH --> CU["ctx.user"]
+  CU --> AA["aspects.alice<br/>includes + provides.igloo"]
+  AA -->|"routes: mutual"| AI
+  AI -->|"routes: mutual"| AA
+  CH --> HM["ctx.hm-host"]
+  AI --> NixOS["nixosConfigurations.igloo"]
+  AA --> NixOS
+  AI --> Darwin["darwinConfigurations.apple"]
+  AA --> Darwin
+
+What It Provides
+
+   Section titled “What It Provides”
+
+         Feature        Provided
+   NixOS + Darwin hosts    ✓
+   Home-Manager            ✓
+   Standalone HM config    ✓
+   Namespaces (eg)         ✓
+   Angle brackets          ✓
+   Mutual providers        ✓
+   VM testing              ✓
+   CI checks               ✓
+
+Next Steps
+
+   Section titled “Next Steps”
+
+     * Study the eg/ namespace aspects as examples for your own libraries
+     * Read Namespaces and Angle Brackets
+     * Explore the CI Tests template for comprehensive feature coverage
+
+   Edit page
+
+   Previous
+   MicroVM Next
+   Bug Reproduction
+
+   Contribute Community Sponsor

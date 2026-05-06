@@ -1,0 +1,192 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Strategy
+     * Tips
+
+On this page
+
+     * Overview
+     * Strategy
+     * Tips
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Migrate to Den
+
+Strategy
+
+   Section titled “Strategy”
+
+   Migration to Den is incremental. You do not need to rewrite everything
+   at once.
+    1. Add Den as Input
+       Add Den to your flake and import the flake module:
+{
+
+       inputs.den.url = "github:vic/den";
+       inputs.import-tree.url = "github:vic/import-tree";
+       outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs;
+       }
+       (inputs.import-tree ./modules);
+       }
+       (BUTTON)
+       modules/den.nix
+{ inputs, ... }: {
+
+       imports = [ inputs.den.flakeModule ];
+       }
+       (BUTTON)
+    2. Declare Hosts
+       Move your host declarations into den.hosts:
+{
+
+       den.hosts.x86_64-linux.laptop.users.alice = { };
+       }
+       (BUTTON)
+    3. Import Existing Modules
+       Use den.provides.import-tree to load your existing non-dendritic
+       modules:
+       modules/legacy.nix
+{ den, ... }: {
+
+       den.ctx.host.includes = [
+       (den.provides.import-tree._.host ./hosts)
+       ];
+       den.ctx.user.includes = [
+       (den.provides.import-tree._.user ./users)
+       ];
+       }
+       (BUTTON)
+       With this directory structure:
+hosts/
+
+       laptop/
+       _nixos/
+       hardware.nix
+       networking.nix
+       _homeManager/
+       shell.nix
+       users/
+       alice/
+       _homeManager/
+       git.nix
+       _nixos/
+       groups.nix
+       (BUTTON)
+       Files under _nixos/ are imported as NixOS modules, _homeManager/ as
+       Home Manager modules, etc. This requires inputs.import-tree.
+    4. Extract Aspects
+       Gradually extract features from your legacy modules into Den
+       aspects:
+       modules/dev-tools.nix
+{
+
+       den.aspects.dev-tools = {
+       nixos = { pkgs, ... }: {
+       environment.systemPackages = with pkgs; [ git vim tmux ];
+       };
+       homeManager.programs.git.enable = true;
+       };
+       }
+       (BUTTON)
+       modules/laptop.nix
+{ den, ... }: {
+
+       den.aspects.laptop.includes = [ den.aspects.dev-tools ];
+       }
+       (BUTTON)
+    5. Remove Legacy
+       As aspects replace legacy modules, remove the corresponding files
+       from hosts/ and users/. Eventually remove den.provides.import-tree
+       usage.
+
+Tips
+
+   Section titled “Tips”
+     * Start with one host. Migrate a single machine first to learn the
+       pattern.
+     * Keep legacy working. import-tree loads your existing files
+       alongside Den aspects — they coexist without conflicts.
+     * Use batteries. Replace manual user/shell/HM setup with
+       den.provides.*.
+     * Test with VM. Use nix run .#vm to validate changes before applying
+       to hardware.
+
+   Edit page
+   Previous
+   Angle Brackets Syntax Next
+   Debug Configurations
+   Contribute Community Sponsor

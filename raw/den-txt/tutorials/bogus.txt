@@ -1,0 +1,262 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributors Guide
+     * Maintainers Guide
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+     * ABC on Den Effects
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Initialize
+     * Project Structure
+     * Writing a Bug Reproduction
+          + How denTest Works
+     * Run Tests
+     * Contributing a Fix
+     * What It Provides
+     * Next Steps
+
+On this page
+
+     * Overview
+     * Initialize
+     * Project Structure
+     * Writing a Bug Reproduction
+          + How denTest Works
+     * Run Tests
+     * Contributing a Fix
+     * What It Provides
+     * Next Steps
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Template: Bug Reproduction
+
+   Source
+
+   templates/bogus
+
+   This template helps you create minimal Den reproductions.
+
+   Use it for:
+     * Showcasing focused demos of how you are trying to use Den.
+     * Reducing a problem to its minimum outside of your infra.
+     * Sharing code that exposes an unknown bug.
+     * Contributing bug fixes to Den core.
+
+   All PRs modifying this template are run by Den CI on the following Den
+   versions: PR_HEAD, main, latest.
+
+   Feel free to send any PR even if you don’t know if it is an actual bug
+   or if you don’t know the solution.
+
+   Just having an small, focused example can help Den maintainers a lot.
+   We can together determine if there’s something we need to fix in Den.
+
+   If you wish to contribute a fix, you are more than welcome, just
+   mention you’d like to work on this at the PR.
+
+   AI Policy
+
+   We accept AI assisted contributions as long as they are clear and
+   focused and don’t introduce unrelated accidental complexity.
+
+   All PR changes must be the absolute minimum required for showing/fixing
+   bugs
+
+Initialize
+
+   Section titled “Initialize”
+   Terminal window
+
+   mkdir bogus && cd bogus
+
+   nix flake init -t github:vic/den#bogus
+   nix flake update den
+   (BUTTON)
+
+Project Structure
+
+   Section titled “Project Structure”
+
+   flake.nix
+
+   modules/
+   bug.nix # your bug reproduction
+   test-base.nix # test infrastructure (DO NOT EDIT)
+   (BUTTON)
+
+Writing a Bug Reproduction
+
+   Section titled “Writing a Bug Reproduction”
+
+   Edit modules/bug.nix with a minimal test case:
+
+   { denTest, ... }:
+
+   {
+   flake.tests.bogus = {
+   test-something = denTest (
+   { den, lib, igloo, tuxHm, ... }:
+   {
+   den.hosts.x86_64-linux.igloo.users.tux = { };
+   # set up the scenario
+   den.aspects.igloo.nixos.environment.sessionVariables.FOO = ["foo"
+   "bar"];
+   # what you get
+   expr = igloo.environment.sessionVariables.FOO;
+   # what you expect
+   expected = "foo:bar";
+   }
+   );
+   };
+   }
+   (BUTTON)
+
+How denTest Works
+
+   Section titled “How denTest Works”
+
+   denTest is a helper that:
+    1. Creates a fresh Den evaluation with your module
+    2. Provides helpers like igloo (host config), tuxHm (user’s HM config)
+    3. Compares expr against expected using nix-unit
+
+   Available test helpers (from test-base.nix):
+     Helper                         Description
+   igloo      nixosConfigurations.igloo.config
+   iceberg    nixosConfigurations.iceberg.config
+   tuxHm      igloo.home-manager.users.tux
+   pinguHm    igloo.home-manager.users.pingu
+   funnyNames Resolves an aspect for class "funny" and collects .names
+   trace      traces included aspect names
+
+   If you want to see some examples, take a look at other bogus reports
+   that are now part of Den repository at:
+   Terminal window
+
+   ls den/templates/ci/modules/features/deadbugs/*.nix
+
+   (BUTTON)
+
+Run Tests
+
+   Section titled “Run Tests”
+   Terminal window
+
+   # From the bogus root
+
+   nix flake check
+   (BUTTON)
+   Terminal window
+
+   # From the Den root
+
+   just bogus
+   (BUTTON)
+
+Contributing a Fix
+
+   Section titled “Contributing a Fix”
+
+   Edit Den /nix or /modules code and run:
+   Terminal window
+
+   just bogus
+
+   (BUTTON)
+
+   When your changes to Den have fixed the bug, be sure to move bug.nix
+   into the templates/ci/modules/feautres/deadbugs/ directory, following
+   naming conventions for both the file and test-suite name.
+
+What It Provides
+
+   Section titled “What It Provides”
+              Feature            Provided
+   nix-unit test infrastructure     ✓
+   Pre-configured denTest helper    ✓
+   Version matrix testing           ✓
+   Common test helpers              ✓
+
+Next Steps
+
+   Section titled “Next Steps”
+     * Read Debug Configurations for debugging techniques
+     * See the CI Tests template for Den’s own comprehensive test suite
+
+   Edit page
+
+   Previous
+   Example Next
+   CI Tests
+
+   Contribute Community Sponsor

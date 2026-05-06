@@ -1,0 +1,162 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributors Guide
+     * Maintainers Guide
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+     * ABC on Den Effects
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Learn
+     * Cookbook
+     * Templates
+     * Reference
+     * Community & Project
+
+On this page
+
+     * Overview
+     * Learn
+     * Cookbook
+     * Templates
+     * Reference
+     * Community & Project
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Documentation Overview
+
+Learn
+
+   Section titled “Learn”
+
+   Understand the principles and mechanisms behind Den.
+   Core Principles Dendritic design: features over hosts, aspects over
+   modules.
+   Context System How den.ctx types define data flow between entities.
+   Aspects & Functors The __functor pattern and aspect structure.
+   Parametric Aspects Context-aware function dispatch via argument
+   introspection.
+   Context Pipeline How host/user/home contexts transform into
+   NixOS/Darwin/HM modules.
+   Library vs Framework Using Den's core lib for any Nix domain.
+
+Cookbook
+
+   Section titled “Cookbook”
+
+   Practical recipes for common tasks.
+   Declare Hosts & Users den.hosts, den.homes, users, and schema options.
+   Configure Aspects Owned configs, includes, provides, and defaults.
+   Custom Nix Classes Create new classes via den.provides.forward.
+   Homes Integration Home Manager, hjem, and nix-maid setup.
+   Use Batteries den.provides.* built-in aspects.
+   Share with Namespaces Publish and consume aspect libraries across
+   flakes.
+   Angle Brackets Syntax path> shorthand via __findFile.
+   Migrate to Den Incremental migration from existing setups.
+   Debug Configurations REPL inspection, tracing, and troubleshooting.
+
+Templates
+
+   Section titled “Templates”
+
+   Step-by-step walkthroughs for each starter template.
+   Templates Overview Comparison of all available templates.
+   Default Recommended: flake-parts + home-manager.
+   Minimal Minimal flake, no flake-parts.
+   Example Cross-platform NixOS + Darwin.
+   No-Flake npins + lib.evalModules.
+   CI Tests Feature tests as executable code examples.
+   Bug Reproduction Isolated template for bug reports.
+
+Reference
+
+   Section titled “Reference”
+
+   API documentation for every Den option.
+   den.ctx Context types, into transformations, provides.
+   den.lib parametric, canTake, take, statics, owned, __findFile.
+   den.aspects Aspect type, resolution, class configs.
+   den.schema Host, user, home schema options.
+   den.provides Built-in batteries reference.
+   flake.* Output generation and instantiation.
+
+Community & Project
+
+   Section titled “Community & Project”
+   Community Discussions, real-world examples, ecosystem.
+   Contributing Tests, CI, code style.
+   Sponsor Support Den development.
+   Edit page
+   Next
+   Motivation
+   Contribute Community Sponsor

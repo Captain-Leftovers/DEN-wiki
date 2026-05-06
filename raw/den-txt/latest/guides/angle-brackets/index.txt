@@ -1,0 +1,176 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * What it Does
+     * Enabling
+     * Resolution Rules
+     * Examples
+     * When to Use
+
+On this page
+
+     * Overview
+     * What it Does
+     * Enabling
+     * Resolution Rules
+     * Examples
+     * When to Use
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Angle Brackets Syntax
+
+   Source
+
+   nix/den-brackets.nix
+
+What it Does
+
+   Section titled “What it Does”
+
+   Den provides a __findFile implementation that resolves <aspect/path>
+   expressions into deep aspect lookups. This is syntactic sugar for
+   accessing nested aspects and provides.
+
+Enabling
+
+   Section titled “Enabling”
+
+   Set __findFile via module args:
+
+   { den, ... }: {
+
+   _module.args.__findFile = den.lib.__findFile;
+   }
+   (BUTTON)
+
+   In any file where you want to use the angle-brackets syntax, add
+   __findFile to the arguments attrset to bring it into that module’s
+   lexical scope.
+
+   { den, __findFile, ... }: {
+
+   ...
+   }
+   (BUTTON)
+
+Resolution Rules
+
+   Section titled “Resolution Rules”
+
+   The <name> expression resolves through these paths in order:
+    1. <den.x.y> — resolves to config.den.x.y
+    2. <aspect> — resolves to config.den.aspects.aspect (if aspect exists
+       in den.aspects)
+    3. <aspect/sub> — resolves to config.den.aspects.aspect.provides.sub
+    4. <namespace> — resolves to config.den.ful.namespace (if it is a
+       denful)
+
+   The / separator is translated to .provides. in the lookup path.
+
+Examples
+
+   Section titled “Examples”
+
+   # Without angle brackets
+
+   den.aspects.laptop.includes = [
+   den.aspects.tools.provides.editors
+   den.aspects.alice.provides.work-vpn
+   den.provides.primary-user
+   ];
+   # With angle brackets
+   den.aspects.laptop.includes = [
+   <tools/editors>
+   <alice/work-vpn>
+   <den.provides.primary-user>
+   ];
+   (BUTTON)
+
+When to Use
+
+   Section titled “When to Use”
+
+   Angle brackets are optional syntactic sugar. They are useful when:
+     * You have deeply nested provides and want shorter references.
+     * You are working with namespaces and want concise cross-references.
+
+   They are functionally identical to direct attribute access. The choice
+   is a matter of style.
+   Edit page
+   Previous
+   Share with Namespaces Next
+   Migrate to Den
+   Contribute Community Sponsor

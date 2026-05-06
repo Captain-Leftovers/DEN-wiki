@@ -1,0 +1,227 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * What are Namespaces
+     * Creating a Namespace
+     * Populating a Namespace
+     * Using Namespaced Aspects
+     * Importing from Upstream
+     * Enabling Angle Brackets
+     * Architecture
+
+On this page
+
+     * Overview
+     * What are Namespaces
+     * Creating a Namespace
+     * Populating a Namespace
+     * Using Namespaced Aspects
+     * Importing from Upstream
+     * Enabling Angle Brackets
+     * Architecture
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Share with Namespaces
+
+   Source
+
+   nix/namespace.nix
+
+What are Namespaces
+
+   Section titled “What are Namespaces”
+
+   A namespace creates a scoped aspect library under den.ful.<name>.
+   Namespaces can be:
+     * Local: defined in your flake, consumed internally.
+     * Exported: exposed via flake.denful.<name> for other flakes to
+       consume.
+     * Imported: merged from upstream flakes into your local den.ful.
+
+Creating a Namespace
+
+   Section titled “Creating a Namespace”
+   modules/namespace.nix
+
+   { inputs, den, ... }: {
+
+   # Create "my" namespace (not exported to flake outputs)
+   imports = [ (inputs.den.namespace "my" false) ];
+   # Or create and export "eg" namespace
+   imports = [ (inputs.den.namespace "eg" true) ];
+   }
+   (BUTTON)
+
+   This creates:
+     * den.ful.eg — the namespace attrset (aspects type).
+     * eg — a module argument alias to den.ful.eg.
+     * flake.denful.eg — flake output (if exported).
+
+Populating a Namespace
+
+   Section titled “Populating a Namespace”
+
+   Define aspects under the namespace using any module:
+   modules/aspects/vim.nix
+
+   {
+
+   eg.vim = {
+   homeManager.programs.vim.enable = true;
+   };
+   }
+   (BUTTON)
+   modules/aspects/desktop.nix
+
+   { eg, ... }: {
+
+   eg.desktop = {
+   includes = [ eg.vim ];
+   nixos.services.xserver.enable = true;
+   };
+   }
+   (BUTTON)
+
+Using Namespaced Aspects
+
+   Section titled “Using Namespaced Aspects”
+
+   Reference them by their namespace:
+
+   { eg, ... }: {
+
+   den.aspects.laptop.includes = [
+   eg.desktop
+   eg.vim
+   ];
+   }
+   (BUTTON)
+
+Importing from Upstream
+
+   Section titled “Importing from Upstream”
+
+   Merge aspects from other flakes:
+   modules/namespace.nix
+
+   { inputs, ... }: {
+
+   # Import "shared" namespace from upstream, merging with local
+   definitions
+   imports = [ (inputs.den.namespace "shared" [ inputs.team-config ]) ];
+   }
+   (BUTTON)
+
+   The namespace function accepts:
+     * A boolean (true/false) for local/exported namespaces.
+     * A list of sources to merge from upstream flakes. Each source’s
+       flake.denful.<name> is merged into den.ful.<name>.
+
+Enabling Angle Brackets
+
+   Section titled “Enabling Angle Brackets”
+
+   When using namespaces, enable angle bracket syntax for terser
+   references:
+
+   { den, ... }: {
+
+   _module.args.__findFile = den.lib.__findFile;
+   }
+   (BUTTON)
+
+   Then reference deep aspects with <namespace/path>:
+
+   den.aspects.laptop.includes = [ <eg/desktop> ];
+
+   (BUTTON)
+
+Architecture
+
+   Section titled “Architecture”
+
+flowchart LR
+  upstream["upstream flake"] -->|"flake.denful.shared"| merge["den.ful.shared"]
+  local["local modules"] -->|"shared.vim = ..."| merge
+  merge --> consumer["den.aspects.*.includes"]
+
+   Edit page
+
+   Previous
+   Use Batteries Next
+   Angle Brackets Syntax
+
+   Contribute Community Sponsor

@@ -1,0 +1,264 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * System batteries
+          + den._.define-user
+          + den._.hostname
+          + den._.os-user
+          + den._.primary-user
+          + den._.user-shell
+          + den._.mutual-provider
+          + den._.tty-autologin
+          + den._.wsl
+          + den._.forward
+          + den._.import-tree
+     * Flake-parts batteries
+          + den._.inputs'
+          + den._.self'
+     * Home-manager batteries
+     * Hjem batteries
+     * Maid batteries
+          + den._.unfree
+
+On this page
+
+     * Overview
+     * System batteries
+          + den._.define-user
+          + den._.hostname
+          + den._.os-user
+          + den._.primary-user
+          + den._.user-shell
+          + den._.mutual-provider
+          + den._.tty-autologin
+          + den._.wsl
+          + den._.forward
+          + den._.import-tree
+     * Flake-parts batteries
+          + den._.inputs'
+          + den._.self'
+     * Home-manager batteries
+     * Hjem batteries
+     * Maid batteries
+          + den._.unfree
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Batteries
+
+   Source
+
+   modules/aspects/provides/
+
+   Den ships reusable aspect providers under den.provides (aliased den._).
+   Each battery contributes NixOS/Darwin/home-manager modules to hosts and
+   users that include them via den.ctx.
+
+System batteries
+
+   Section titled “System batteries”
+
+den._.define-user
+
+   Section titled “den._.define-user”
+
+   Creates OS-level user accounts (users.users.<name>) with isNormalUser,
+   and home directory. Works on NixOS/Darwin/WSL/HomeManager.
+
+den._.hostname
+
+   Section titled “den._.hostname”
+
+   Automatically sets the host’s name to the one defined in
+   den.hosts.<name>.hostName. Works on NixOS/Darwin/WSL.
+
+den._.os-user
+
+   Section titled “den._.os-user”
+
+   A user class automatically enabled by Den to forward settings into the
+   host’s users.users.<userName>. Forwards work into NixOS/Darwin classes.
+
+den._.primary-user
+
+   Section titled “den._.primary-user”
+
+   Marks a user as the primary user (admin level) of a host. Works in
+   NixOS/Darwin/WSL.
+
+den._.user-shell
+
+   Section titled “den._.user-shell”
+
+   Sets the user’s login shell. users.users.<name>.shell enabling the
+   shell at host, and the home-manager programs.<shell>.enable.
+
+den._.mutual-provider
+
+   Section titled “den._.mutual-provider”
+
+   Allows the user and host to contribute configuration to each other via
+   .provides..
+
+den._.tty-autologin
+
+   Section titled “den._.tty-autologin”
+
+   Configures TTY auto-login for the primary user via
+   services.getty.autologinUser.
+
+den._.wsl
+
+   Section titled “den._.wsl”
+
+   WSL-specific activation. Enables den.ctx.wsl-host when the
+   host.wsl.enable = true and includes NixOS-WSL module.
+
+den._.forward
+
+   Section titled “den._.forward”
+
+   Forwards aspect configuration from one aspect to another. Used for
+   separation of conncerns. See Custom Classes section.
+
+den._.import-tree
+
+   Section titled “den._.import-tree”
+
+   Provides inputs.import-tree helpers to import trees of non-dendritic
+   legacy modules, like a directory containing only nixos modules.
+
+Flake-parts batteries
+
+   Section titled “Flake-parts batteries”
+
+   These only work when the module system is flake-parts’.
+
+den._.inputs'
+
+   Section titled “den._.inputs'”
+
+   Exposes inputs' (system-qualified inputs) into aspect modules. Source:
+   provides/flake-parts/inputs.nix
+
+den._.self'
+
+   Section titled “den._.self'”
+
+   Exposes self' (system-qualified self outputs) into aspect modules.
+   Source: provides/flake-parts/self.nix
+
+Home-manager batteries
+
+   Section titled “Home-manager batteries”
+
+   Defines den.ctx.hm-host which activates when at least one user has
+   homeManager classes. The hm-host context can be used to set
+   home-manager.useGlobalPkgs and useUserPackages.
+
+   Merges home-manager configuration into the host OS module system.
+   Bridges home-manager.users.<name> with the user’s homeManager class.
+
+   Imports the appropriate home-manager module (nixos or darwin).
+
+Hjem batteries
+
+   Section titled “Hjem batteries”
+
+   Integrates hjem as an alternative to home-manager. Imports hjem’s
+   NixOS/Darwin module.
+
+   Merges hjem user configuration into the host. Sets hjem.users.<name>
+   from the user’s hjem class.
+
+Maid batteries
+
+   Section titled “Maid batteries”
+
+   Integrates maid as an alternative home management system.
+
+   Merges maid configuration into the host OS users.users.<name>.maid for
+   each user maid class.
+
+den._.unfree
+
+   Section titled “den._.unfree”
+
+   Allows unfree packages by name via nixpkgs.config.allowUnfreePredicate.
+   Edit page
+   Previous
+   den.aspects Next
+   den.ctx
+   Contribute Community Sponsor

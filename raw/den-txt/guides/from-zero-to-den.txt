@@ -1,0 +1,382 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributors Guide
+     * Maintainers Guide
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+     * ABC on Den Effects
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+          + Step 1. A Den-dritic layout
+          + Step 2. Pinning Den and dependencies
+          + Step 3. Your Den Entry Point
+          + Step 4. Host configuration in Den
+          + Step 5. Building your NixOS configuration
+     * Next Steps
+
+On this page
+
+     * Overview
+          + Step 1. A Den-dritic layout
+          + Step 2. Pinning Den and dependencies
+          + Step 3. Your Den Entry Point
+          + Step 4. Host configuration in Den
+          + Step 5. Building your NixOS configuration
+     * Next Steps
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+From Zero to Den
+
+   Shortcut: See templates/noflake
+
+   This is a step-by-step tutorial for learn-by-doing people. It requires
+   time.
+
+   However it is a very recommended read for all people new to Den, as
+   this guide introduces Den concepts from ground up.
+
+   If you are a bit impatient and want to skip all this, Den provides
+   noflake template that is basically the result of this guide. As well as
+   several other templates with different feature sets.
+
+   Note
+
+   This guide shows how to create a Den config from scratch.
+
+   It is intended for people using a configuration.nix file as generated
+   by the NixOS installer and willing to adopt Den with it.
+
+   There’s not much manual work to do here, but there’s a lot of insight
+   on what is happening and Den concepts, so grab something to drink while
+   you read.
+
+   This guide assumes you have familiarity with:
+     * configuration.nix
+     * No Nix flakes. NixOS installer creates /etc/nixos/configuration.nix
+       because that is the recommended, stable Nix way. This guide follows
+       same path of not demanding flakes. See From Flake to Den guide if
+       you use Nix unstable features like flakes.
+     * nixos-rebuild tool to build your OS
+     * npins tool for fetching Den and dependencies.
+
+Step 1. A Den-dritic layout
+
+   Section titled “Step 1. A Den-dritic layout”
+
+   Our first step is creating a directory layout for your Den.
+   Terminal window
+
+   mkdir ./modules # Dendritic modules directory
+
+   cp -r /etc/nixos ./modules/_nixos # OPTIONAL existing NixOS modules
+   (BUTTON)
+    1. All your Dendritic Nix modules will be loaded by import-tree
+       automatically from ./modules
+    2. (optional) Copy your existing NixOS modules into modules/_nixos.
+       The _ is important for import-tree to ignore and NOT auto-load
+       _nixos/configuration.nix nor _nixos/hardware-configuration.nix
+       since they are regular NixOS modules and not Dendritic ones.
+
+Step 2. Pinning Den and dependencies
+
+   Section titled “Step 2. Pinning Den and dependencies”
+
+   This step will use npins to fetch and lock some dependencies that will
+   integrate all together:
+   Terminal window
+
+   npins init # adds nixpkgs channel
+
+   npins add github vic import-tree -b main # for auto-importing ./modules
+   npins add github vic den -b main # Den itself, of course
+   npins add github vic with-inputs -b main # flake-like inputs without
+   Nix flakes.
+   npins add github nix-community home-manager --branch master # OPTIONAL
+   home integration
+   (BUTTON)
+
+Step 3. Your Den Entry Point
+
+   Section titled “Step 3. Your Den Entry Point”
+
+   Lets create default.nix. This file will serve as the entrypoint to all
+   your configuration. Once you have default.nix you will very rarely need
+   to touch it again.
+   default.nix
+
+   let
+
+   sources = import ./npins; # (1)
+   with-inputs = import sources.with-inputs sources { }; # (2)
+   outputs = inputs:
+   (inputs.nixpkgs.lib.evalModules { # (3)
+   modules = [ (inputs.import-tree ./modules) ]; # (4)
+   specialArgs.inputs = inputs; # (5)
+   }).config.flake; # (6)
+   in
+   with-inputs outputs # (7)
+   (BUTTON)
+
+   A tiny file, but a lof of things happening on it:
+    1. Import fetched and already locked dependencies using npins.
+    2. Flake like input follows and overrides via with-inputs.
+       This ensures full compatibility between flakes and non-flakes
+       worlds. You can share and re-use Dendritic modules from other
+       people independently if they use flakes or not. Also in case you
+       later move into flakes, nothing in your modules changes, just the
+       entrypoint.
+    3. Merges all imported modules into an actual unified config.
+    4. Single usage of import-tree to load all modules recursively.
+    5. Provide { inputs, ... } special argument to all modules.
+    6. Read from Den’s flake output where nixosConfigurations are placed
+       for compatibility between flakes and non-flakes environments.
+    7. Invokes output with resolved inputs.
+
+Step 4. Host configuration in Den
+
+   Section titled “Step 4. Host configuration in Den”
+
+   No Monoliths
+
+   For brevity and teaching purposes, this guide uses a single
+   modules/den.nix file. But Dendritic setups are not monolithic unlike
+   most flake examples in the wild.
+
+   The recommendation is to split your modules as they make sense to you.
+   Any file can contribute to any Den aspects and hosts/users can be
+   defined anywhere.
+
+   Recommended read: Dendritic Advantages and Dendritic FAQ
+   modules/den.nix
+
+   { inputs, den, lib, ... }: {
+
+   imports = [ inputs.den.flakeModule ]; # (1)
+   den.schema.user.classes = lib.mkDefault [ "homeManager" ]; # (2)
+   den.default.homeManager.home.stateVersion = "25.11"; # (3)
+   den.hosts.x86_64-linux.igloo.users.tux = {}; # (4) (5)
+   den.aspects.igloo = { # (6)
+   includes = [ den.provides.hostname ]; # (7)
+   nixos = { pkgs, ... }: {
+   imports = [ ./_nixos/configuration.nix ]; # (8)
+   environment.systemPackages = [ pkgs.hello ];
+   };
+   };
+   den.aspects.tux = { # (9)
+   includes = [ den.provides.define-user den.provides.primary-user ]; #
+   (10)
+   homeManager = { pkgs, ... }: {
+   home.packages = [ pkgs.vim ];
+   };
+   };
+   }
+   (BUTTON)
+
+   This is all that is happening at modules/den.nix.
+    1. Imports den-framework features into the module system.
+       This provides the den module argument as well as all den.* options,
+       nixosConfigurations outputs.
+    2. (optional, if you added home-manager dependency). This example
+       shows how to enable homeManager integration for all users by
+       default.
+       Den supports multiple home environments, that is why none of them
+       is enabled by default in Den. Freedom of choice is important, same
+       as with flakes.
+       Home Integration is a User concern, so it is configured at each
+       independent <user>.classes or den.schema.user for all of them. See
+       User Declaration and Homes Integration for more.
+       Nix Classes
+       An aspect is just an attrset that contains modules of different Nix
+       class.
+gaming = { nixos = ...; homeManager = ...; hjem = ...; }
+
+       (BUTTON)
+       Such an attrset is said to be Dendritic because it allows
+       configuring a single cross-cutting concern (gaming) over different
+       Nix classes.
+       Nix classes are NOT an artificial concept created by Den. There are
+       many nix classes in the wild, the most common are nixos, darwin,
+       homeManager.
+    3. den.default applies settings to all hosts, users, and homes. This
+       is the right place for stateVersion and other global policies.
+    4. Host definitions go inside den.hosts.
+       This single line defines a host with hostName igloo, platform
+       x86_64-linux from which class = "nixos" is derived, and a single
+       user tux in it. See Declare Hosts & Users for more.
+       Den automatically creates an aspect for each host that looks like
+       this:
+den.aspects.igloo = parametric {
+
+       nixos = {};
+       };
+       (BUTTON)
+       parametric means that this aspect is able to pass its context (the
+       {host} definition for igloo into other aspects being included in
+       it. See Parametric Aspects for more this.
+    5. User definitions inside host.
+       Hosts can have zero or more users. This example shows only one:
+       tux.
+       Each user can define its own configuration via freeform attributes,
+       or define values for options from den.schema.user, like classes.
+       See Schema Reference for more.
+den.hosts.x86_64-linux.igloo.users = {
+
+       tux = {
+       likes = [ "fishes"; ];
+       classes = [ "homeManager" "hjem" ];
+       };
+       pingu = {
+       likes = [ "music" ];
+       classes = [ "maid" ];
+       };
+       };
+       (BUTTON)
+       Just like hosts, users also get an aspect automatically created by
+       Den from their definition:
+den.aspects.tux = parametric {
+
+       homeManager = {};
+       hjem = {};
+       };
+       den.aspects.pingu = parametric {
+       maid = {};
+       };
+       (BUTTON)
+    6. Enhance the igloo host aspect.
+       Remember that den.aspects.igloo was already created for you by Den
+       from the host definition?. Well, in this step you are extending the
+       aspect with more configuration. Any file can do this, contribute to
+       any host or user aspect as they please. This is called Incremental
+       Features in the Dendritic Advantages article.
+    7. Include re-usable features from other, generic aspects.
+       One of the advantages of Den aspects is that they can easily form a
+       DAG via .includes and .provides.
+       Den aspects are parametric, they are funtions taking a contexts. A
+       context like {host} is simply an attribute set that holds the igloo
+       host definition from our examples. These are arguments to real Nix
+       functions, NOT _module.args nor specialArgs. This is why these
+       values can be used for conditional includes.
+       Den provides some common batteries. Re-usable aspects like
+       den.provides.hostname which is defined like this:
+den.provides.hostname = { host, ... }: { # host = igloo definition
+
+       nixos.networking.hostName = host.hostName; # value from Host Schema
+       };
+       (BUTTON)
+    8. optional if you copied /etc/nixos into modules/_nixos) Import
+       Non-Dendritic NixOS modules.
+       The nixos attribute value is just a regular NixOS module. Because
+       of this, it can import your previous ./_nixos/configuration.nix
+       module or any other NixOS module from Nix libraries.
+    9. Enhance the User aspect.
+       As with the host aspect, Den also automatically created a user
+       aspect. Here, you are extending it with more configuration.
+   10. Include re-usable {host, user} batteries.
+       Batteries like den.provides.primary-user take the {host, user}
+       context where host is the igloo definition and user is the tux
+       definition.
+       These batteries also serve as example for you to create custom
+       re-usable pieces of configuration shareable on several user/hosts
+       or shared with the community.
+
+   Phew, lots of things we’ve learned! Our single and final step is
+
+Step 5. Building your NixOS configuration
+
+   Section titled “Step 5. Building your NixOS configuration”
+   Terminal window
+
+   nixos-rebuild build --file . -A nixosConfigurations.igloo
+
+   (BUTTON)
+
+Next Steps
+
+   Section titled “Next Steps”
+
+   Congrats on your first Den!
+
+   You know most important concepts there’s to know about Den.
+
+   All other things can be learned incrementally or as needed.
+
+   You can now head over to other guides or the reference:
+     * den.schema
+     * den.aspects
+     * den.ctx
+     * den.provides
+
+   Edit page
+   Previous
+   Flake Parts Modules Next
+   From Flake to Den
+   Contribute Community Sponsor

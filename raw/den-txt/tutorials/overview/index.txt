@@ -1,0 +1,185 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributors Guide
+     * Maintainers Guide
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+     * ABC on Den Effects
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Choosing a Template
+     * Quick Start
+     * Project Structure
+     * What Each Template Demonstrates
+     * Next Steps
+
+On this page
+
+     * Overview
+     * Choosing a Template
+     * Quick Start
+     * Project Structure
+     * What Each Template Demonstrates
+     * Next Steps
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Templates Overview
+
+   Den ships six templates that cover progressively complex setups. Use
+   nix flake init to scaffold a new project:
+   Terminal window
+
+   nix flake init -t github:vic/den#<template>
+
+   (BUTTON)
+
+Choosing a Template
+
+   Section titled “Choosing a Template”
+   Template Use case Flakes flake-parts Home-Manager
+   minimal Smallest possible Den setup ✓ ✗ ✗
+   default Recommended starting point ✓ ✓ ✓
+   example Feature showcase with namespaces ✓ ✓ ✓
+   noflake Stable Nix, no flakes ✗ ✗ ✗
+   nvf-standalone Den based NVF without NixOS ✓ ✗ ✗
+   microvm MicroVM host and guests ✓ ✗ ✗
+   flake-parts-modules flake-parts perSystem submodules ✓ ✓ ✗
+   bogus Bug reproduction ✓ ✓ ✓
+   ci Den’s own test suite ✓ ✓ ✓
+
+Quick Start
+
+   Section titled “Quick Start”
+   Terminal window
+
+   mkdir my-nix && cd my-nix
+
+   nix flake init -t github:vic/den
+   nix flake update den
+   (BUTTON)
+
+   This clones the default template. Edit modules/hosts.nix to declare
+   your machines, then:
+   Terminal window
+
+   nix run .#vm
+
+   (BUTTON)
+
+Project Structure
+
+   Section titled “Project Structure”
+
+   Every template follows the same pattern:
+
+   flake.nix # or default.nix for noflake
+
+   modules/
+   den.nix # host/user declarations + den.flakeModule import
+   *.nix # aspect definitions, one concern per file
+   (BUTTON)
+
+   Den uses import-tree to recursively load all .nix files under modules/.
+   You never need to manually list imports — just create files.
+
+What Each Template Demonstrates
+
+   Section titled “What Each Template Demonstrates”
+     * minimal — The absolute minimum: one host, one user, no extra
+       dependencies
+     * default — Production-ready structure with Home-Manager, VM testing,
+       dendritic flake-file
+     * example — Namespaces, angle brackets, cross-platform (NixOS +
+       Darwin), providers
+     * noflake — Using Den with npins instead of flakes
+     * microvm — Demostrates Den extensibility showcasing MicroVM
+       virtualization.
+     * nvf-standalone — Demostrates Den outside the NixOS/nix-Darwin
+       framework.
+     * flake-parts-modules — Integrate Den aspects with third-party
+       flake-parts perSystem submodules.
+     * bogus — Creating minimal reproductions for bug reports with
+       nix-unit
+     * ci — Comprehensive tests covering every Den feature (your best
+       learning resource)
+
+Next Steps
+
+   Section titled “Next Steps”
+
+   Start with the Minimal template to understand Den’s core, then graduate
+   to Default for a real setup.
+   Edit page
+   Previous
+   ABC on Den Effects Next
+   Minimal
+   Contribute Community Sponsor

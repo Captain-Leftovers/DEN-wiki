@@ -1,0 +1,129 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Get Support
+     * Real-World Examples
+
+On this page
+
+     * Overview
+     * Get Support
+     * Real-World Examples
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Community
+
+Get Support
+
+   Section titled “Get Support”
+     * GitHub Discussions — ask questions, share ideas
+     * Zulip Chat — real-time help
+     * Matrix Channel — chat with the community
+
+   Everyone is welcome. The only rule: be mindful and respectful.
+
+Real-World Examples
+
+   Section titled “Real-World Examples”
+
+     Want yours featured? Send vic a DM at zulip or matrix.
+
+     * vic/vix — Den author’s personal infra.
+     * quasigod.xyz/nixconfig - From Unify framework author. Now using
+       Den: beautiful code organization, usage of angle-brackets and
+       provides.
+     * Adda/nixos-config - A comprehensive system configuration for
+       multiple hosts
+     * drupol/infra - PR from author of famous “Flipping the Configuration
+       Matrix” blog-post, adopting Den.
+     * GitHub Search — find more
+
+Ecosystem
+
+   Section titled “Ecosystem”
+     * flake-aspects — aspect composition library
+     * flake-file — real Nix input definitions and output schemas
+     * import-tree — recursive module imports
+     * with-inputs — flake resolved inputs for non-flakes
+     * denful — community aspect distribution
+     * dendrix — index of dendritic aspects
+     * Dendritic Design — the pattern that inspired Den
+
+   Edit page
+   Previous
+   Versioning Next
+   Contributing
+   Contribute Community Sponsor

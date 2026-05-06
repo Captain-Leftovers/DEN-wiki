@@ -1,0 +1,336 @@
+    Skip to content
+
+   den
+   (BUTTON) Search CtrlK
+   (BUTTON) Cancel
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   (BUTTON)
+     * Den
+     * Learn
+     * Templates
+     * Cookbook
+     * Reference
+
+     * Overview
+     * Motivation
+     * Versioning
+     * Community
+     * Contributing
+
+     * Core Principles
+     * Context System
+     * Aspects & Functors
+     * Parametric Aspects
+     * NixOS Context Pipeline
+     * Library vs Framework
+
+     * Overview
+     * Minimal
+     * Default
+     * No-Flake
+     * NVF Standalone
+     * MicroVM
+     * Example
+     * Bug Reproduction
+     * CI Tests
+     * Flake Parts Modules
+
+     * From Zero to Den
+     * From Flake to Den
+     * Declare Hosts & Users
+     * Configure Aspects
+     * Host<->User Mutual Config
+     * Custom Nix Classes
+     * Homes Integration
+     * Use Batteries
+     * Share with Namespaces
+     * Angle Brackets Syntax
+     * Migrate to Den
+     * Debug Configurations
+
+     * den.schema
+     * den.aspects
+     * den.provides
+     * den.ctx
+     * den.lib
+     * flake.*
+
+   Sponsor Den [den?logo=github&color=white] Ask DeepWiki GitHub
+   Select theme [Auto_]
+   On this page
+     * Overview
+     * Two MicroVM Patterns
+          + 1. Runnable MicroVM as Package
+          + 2. Declarative Guest VMs on Host
+     * Initialize
+     * Project Structure
+     * Key Features Shown
+          + Standalone Runnable MicroVM
+          + Schema Extensions for MicroVM Options
+          + Host with Declarative Guests
+          + Custom Context Pipeline
+     * Data Flow
+     * What It Provides
+     * Next Steps
+
+On this page
+
+     * Overview
+     * Two MicroVM Patterns
+          + 1. Runnable MicroVM as Package
+          + 2. Declarative Guest VMs on Host
+     * Initialize
+     * Project Structure
+     * Key Features Shown
+          + Standalone Runnable MicroVM
+          + Schema Extensions for MicroVM Options
+          + Host with Declarative Guests
+          + Custom Context Pipeline
+     * Data Flow
+     * What It Provides
+     * Next Steps
+
+vic/den?
+
+   Become a Sponsor
+
+   Den is part of @vic's Dendritic Ecosystem — made with love and
+   maintained with passion.
+     * import-tree
+     * flake-aspects
+     * flake-file
+     * with-inputs
+     * denful
+     * dendrix
+
+   More @vic OpenSource
+
+Template: MicroVM
+
+   Source
+
+   templates/microvm
+
+   templates/microvm demonstrates Den’s extensibility: custom den.ctx and
+   den.schema extensions for integrating other Nix libraries like
+   MicroVM.nix.
+
+   This template shows two patterns for building MicroVMs with Den.
+
+Two MicroVM Patterns
+
+   Section titled “Two MicroVM Patterns”
+
+1. Runnable MicroVM as Package
+
+   Section titled “1. Runnable MicroVM as Package”
+
+   A standalone NixOS configuration that runs as MicroVM directly as an
+   application.
+     * Den example: runnable-example.nix
+     * Den support: microvm-runners.nix
+
+   Terminal window
+
+   nix run .#runnable-microvm
+
+   (BUTTON)
+
+   See MicroVM Docs on Package Runners
+
+2. Declarative Guest VMs on Host
+
+   Section titled “2. Declarative Guest VMs on Host”
+
+   Guest MicroVMs declared on a host and managed together.
+     * Den example: guests-example.nix
+     * Den support: microvm-integration.nix
+
+   Terminal window
+
+   nixos-rebuild build --flake .#server
+
+   (BUTTON)
+
+   See MicroVM Docs on Declarative MicroVMs
+
+Initialize
+
+   Section titled “Initialize”
+   Terminal window
+
+   mkdir my-nix && cd my-nix
+
+   nix flake init -t github:vic/den#microvm
+   nix flake update den
+   (BUTTON)
+
+Project Structure
+
+   Section titled “Project Structure”
+
+   flake.nix
+
+   modules/
+   den.nix # Enable Den + hostname for all hosts
+   runnable-example.nix # Standalone NixOS MicroVM
+   microvm-runners.nix # Auto-expose runnable VMs as flake packages
+   guests-example.nix # Server host with declarative guest VMs
+   microvm-integration.nix # Schema extensions + context pipelines
+   (BUTTON)
+
+Key Features Shown
+
+   Section titled “Key Features Shown”
+
+Standalone Runnable MicroVM
+
+   Section titled “Standalone Runnable MicroVM”
+
+   Any runnable MicroVM with declaredRunner is auto-exposed as a flake
+   package:
+   modules/microvm-runners.nix
+
+   flake.packages = {
+
+   x86_64-linux.runnable-microvm = <runner>;
+   };
+   (BUTTON)
+
+Schema Extensions for MicroVM Options
+
+   Section titled “Schema Extensions for MicroVM Options”
+
+   microvm-integration.nix extends den.schema.host with MicroVM-specific
+   options:
+
+   options.microvm.guests = lib.mkOption {
+
+   type = lib.types.listOf lib.types.raw;
+   description = "List of Den hosts to run as guest VMs";
+   };
+   options.microvm.sharedNixStore = lib.mkEnableOption "Auto share nix
+   store";
+   (BUTTON)
+
+Host with Declarative Guests
+
+   Section titled “Host with Declarative Guests”
+   modules/guests-example.nix
+
+   # Server host with guest VM
+
+   den.hosts.x86_64-linux.server.microvm.guests = [
+   den.hosts.x86_64-linux.guest-microvm
+   ];
+   # Guest VM declaration (no top-level nixosConfiguration)
+   den.hosts.x86_64-linux.guest-microvm.intoAttr = [];
+   # Server config
+   den.aspects.server = {
+   nixos.microvm.host.startupTimeout = 300;
+   };
+   den.aspects.guest-microvm = {
+   # Den resolved and forwarded to
+   `<host>.microvm.vms.guest-microvm.config`
+   nixos = { pkgs, ... }: {
+   environment.systemPackages = [ pkgs.cowsay ];
+   };
+   # Forwarded to `<host>.microvm.vms.guest-microvm`
+   microvm.autostart = true;
+   };
+   (BUTTON)
+
+Custom Context Pipeline
+
+   Section titled “Custom Context Pipeline”
+
+   Two-stage pipeline for MicroVM host and guests:
+
+   # Stage 1: host → microvm-host (only if guests is non-empty)
+
+   ctx.host.into.microvm-host = { host }:
+   lib.optional (host.microvm.guests != []) { inherit host; };
+   # microvm-host provides Host configuration
+   ctx.microvm-host.provides.microvm-host = { host }: {
+   ${host.class}.imports = [ host.microvm.hostModule ];
+   };
+   # Stage 2: microvm-host → microvm-guest
+   ctx.microvm-host.into.microvm-guest = { host }:
+   map (vm: { inherit host vm; }) host.microvm.guests;
+   # Guest configuration forwarded to host
+   ctx.microvm-host.provides.microvm-guest = { host, vm }: {
+   includes = [
+   # Auto-share nix store if enabled
+   sharedNixStore
+   # Den resolved NixOS module forwarded to
+   <host>.nixos.microvm.vms.${vm.name}.config
+   (den.provides.forward { ... })
+   # Forward guest `microvm` class directly to
+   <host>.nixos.microvm.vms.${vm.name}
+   (den.provides.forward { ... })
+   ];
+   };
+   (BUTTON)
+
+Data Flow
+
+   Section titled “Data Flow”
+
+graph TD
+    D1["server host"]
+    D2["den.ctx.host<br/>normal pipeline"]
+    D3["server nixos config"]
+    D5["host.microvm.host<br/>loaded"]
+
+    D6["guest-microvm host"]
+    D7["den.ctx.host<br/>NORMAL PIPELINE"]
+    D8["guest nixos config<br/>+ microvm class<br/>all Den features supported"]
+
+    D9["forward to host:<br/>microvm.vms.guest-microvm.config"]
+    D10["forward to host:<br/>microvm.vms.guest-microvm"]
+    D11["server nixosConfiguration"]
+
+    D1 -->|Den transforms to| D2
+    D2 -->|microvm.guests != empty<br/>triggers microvm-host| D5
+    D2 -->|produces| D3
+
+    D6 -->|Uses normal Den pipeline<br/>den.ctx.host host=guest| D7
+    D7 -->|produces| D8
+
+    D8 -->|forward nixos| D9
+    D8 -->|forward microvm| D10
+    D3 --> D11
+    D5 --> D11
+    D9 --> D11
+    D10 --> D11
+
+What It Provides
+
+   Section titled “What It Provides”
+
+           Feature          Provided
+   Custom context pipelines    ✓
+   Schema extensions           ✓
+   Forward providers           ✓
+   Standalone runnable VMs     ✓
+   Host-guest architecture     ✓
+   Declarative MicroVM         ✓
+   Auto nix store sharing      ✓
+
+Next Steps
+
+   Section titled “Next Steps”
+
+     * Read MicroVM Documentation
+     * Check Package Runners
+     * Explore Host Configuration
+     * Learn Declarative VMs
+
+   Edit page
+
+   Previous
+   NVF Standalone Next
+   Example
+
+   Contribute Community Sponsor
